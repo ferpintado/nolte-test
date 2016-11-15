@@ -6,5 +6,6 @@ Author: Fernando Pintado
 Description: A plugin to show movies nicely
 */
 
-
+require_once('moviesNolte.class.php');
+$mN = new MoviesNolte;
 ?>
