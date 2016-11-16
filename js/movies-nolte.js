@@ -6,7 +6,7 @@ moviesNolteModule.factory('MoviesService', function( $http ){
     var MoviesService = {
         getAll: function() {
             
-            var promise = $http.get( 'movies.json' ).then( function( response) {
+            var promise = $http({method: 'GET', url: 'movies.json' }).success( function( response) {
                 return response.data;
             });
             
@@ -24,7 +24,7 @@ moviesNolteModule.directive('moviesNolteList', function( MoviesService ) {
         templateUrl: '/wp-content/plugins/moviesnolte/js/movies-list.html',
         link: function() {
             MoviesService.getAll().then( function( data ){
-                console.log( data );
+                console.log( data.data );
             })
             
         }

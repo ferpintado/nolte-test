@@ -247,9 +247,10 @@ class Movies_Nolte {
         wp_reset_postdata(); 
 	    
         endif;
-        
-        header( 'Content-Type: application/json' );
-	    wp_send_json( $movies_array );
+        header("Access-Control-Allow-Origin: *");
+        header( 'Content-Type: application/json;' );
+        // array('text' => 'asdasd', 'number' => 0)
+	    wp_send_json( array('text' => 'asdasd', 'number' => 0) );
 	    
 	}
 	
