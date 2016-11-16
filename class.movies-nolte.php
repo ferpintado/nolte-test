@@ -6,11 +6,16 @@ class Movies_Nolte {
         
         add_action( 'init', array( $this, 'register_movies_post_type') );
         add_action( 'init', array( $this, 'rewrite_url') );
+        add_action( 'init', array( $this, 'register_shortcode') );
         
         add_action( 'template_redirect', array( $this, 'json_output' ) );
         
-        add_action( 'add_meta_boxes', array( $this, 'register_metaBox' ) );
+        add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
         add_action( 'save_post', array( $this, 'save_meta' ) );
+        
+        add_action( 'wp_enqueue_scripts', array($this, 'import_script_files' ) );
+        
+       
     }
     
     /**
@@ -37,10 +42,10 @@ class Movies_Nolte {
     	);
 
     	$args = array(
-    		'labels'             => $labels,
+            'labels'             => $labels,
             'description'        => __( 'Movies.', 'movies_noite' ),
-    		'public'             => true,
-    		'publicly_queryable' => true,
+            'public'             => true,
+            'publicly_queryable' => true,
     		'show_ui'            => true,
     		'show_in_menu'       => true,
     		'query_var'          => true,
@@ -191,7 +196,9 @@ class Movies_Nolte {
 	 * Rewriting url so that it can be accessible from /movies.json
 	 */
 	public function rewrite_url() {
-	    add_rewrite_rule( '/movies.json', 'index.php?movies=all', 'top' );
+	    global $wp_rewrite;
+	    add_rewrite_tag( '%movies%', '([^&]+)' );
+	    add_rewrite_rule( 'movies.json', 'index.php?movies=all', 'top' );
 	}
 	
 	/**
@@ -245,5 +252,19 @@ class Movies_Nolte {
 	    wp_send_json( $movies_array );
 	    
 	}
+	
+	public function register_shortcode() {
+	    add_shortcode('list-movies', array( $this, 'render_shortcode' ) );
+	}
+	
+    public function render_shortcode() {
+        $output = "<div ng-app='moviesNolte'><div data-movies-nolte-list></div></div>";
+        echo $output;
+    }
+    
+    public function import_script_files() {
+        wp_enqueue_script( 'angular-js', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js', array(), false, true );
+        wp_enqueue_script( 'movies-nolte-js', plugins_url( 'js/movies-nolte.js', __FILE__ ), array(), false, true );
+    }
 }
 ?>
