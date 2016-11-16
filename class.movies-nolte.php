@@ -13,55 +13,57 @@ class Movies_Nolte {
         add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
         add_action( 'save_post', array( $this, 'save_meta' ) );
         
+        add_action( 'admin_print_scripts', array($this, 'import_admin_script_files' ) ) ;
+        add_action( 'admin_print_styles', array($this, 'import_admin_styles_files' ) );
         add_action( 'wp_enqueue_scripts', array($this, 'import_script_files' ) );
         
        
     }
     
     /**
-	 * Register movies custom post type
-	 */
+     * Register movies custom post type
+     */
     public function register_movies_post_type() {
 
         
         $labels = array(
-		'name'               => _x( 'Movies', 'post type general name', 'movies_noite' ),
-		'singular_name'      => _x( 'Movie', 'post type singular name', 'movies_noite' ),
-		'menu_name'          => _x( 'Movies', 'admin menu', 'movies_noite' ),
-		'name_admin_bar'     => _x( 'Movie', 'add new on admin bar', 'movies_noite' ),
-		'add_new'            => _x( 'Add New', 'movie', 'movies_noite' ),
-		'add_new_item'       => __( 'Add New Movie', 'movies_noite' ),
-		'new_item'           => __( 'New Movie', 'movies_noite' ),
-		'edit_item'          => __( 'Edit Movie', 'movies_noite' ),
-		'view_item'          => __( 'View Movie', 'movies_noite' ),
-		'all_items'          => __( 'All Movies', 'movies_noite' ),
-		'search_items'       => __( 'Search Movies', 'movies_noite' ),
-		'parent_item_colon'  => __( 'Parent Movies:', 'movies_noite' ),
-		'not_found'          => __( 'No Movies found.', 'movies_noite' ),
-		'not_found_in_trash' => __( 'No Movies found in Trash.', 'movies_noite' )
-    	);
+        'name'               => _x( 'Movies', 'post type general name', 'movies_noite' ),
+        'singular_name'      => _x( 'Movie', 'post type singular name', 'movies_noite' ),
+        'menu_name'          => _x( 'Movies', 'admin menu', 'movies_noite' ),
+        'name_admin_bar'     => _x( 'Movie', 'add new on admin bar', 'movies_noite' ),
+        'add_new'            => _x( 'Add New', 'movie', 'movies_noite' ),
+        'add_new_item'       => __( 'Add New Movie', 'movies_noite' ),
+        'new_item'           => __( 'New Movie', 'movies_noite' ),
+        'edit_item'          => __( 'Edit Movie', 'movies_noite' ),
+        'view_item'          => __( 'View Movie', 'movies_noite' ),
+        'all_items'          => __( 'All Movies', 'movies_noite' ),
+        'search_items'       => __( 'Search Movies', 'movies_noite' ),
+        'parent_item_colon'  => __( 'Parent Movies:', 'movies_noite' ),
+        'not_found'          => __( 'No Movies found.', 'movies_noite' ),
+        'not_found_in_trash' => __( 'No Movies found in Trash.', 'movies_noite' )
+        );
 
-    	$args = array(
+        $args = array(
             'labels'             => $labels,
             'description'        => __( 'Movies.', 'movies_noite' ),
             'public'             => true,
             'publicly_queryable' => true,
-    		'show_ui'            => true,
-    		'show_in_menu'       => true,
-    		'query_var'          => true,
-    		'capability_type'    => 'post',
-    		'has_archive'        => true,
-    		'hierarchical'       => false,
-    		'menu_position'      => null,
-    		'supports'           => array( 'title', 'author', 'thumbnail', 'comments' )
-    	);
-    	
-    	register_post_type( 'movies', $args );
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'capability_type'    => 'post',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => null,
+            'supports'           => array( 'title', 'author', 'thumbnail', 'comments' )
+        );
+        
+        register_post_type( 'movies', $args );
     }
     
     /**
-	 * Adding metabox to movies custom post type
-	 */
+     * Adding metabox to movies custom post type
+     */
     public function register_meta_box() {
         add_meta_box(
             'movie_information',
@@ -76,9 +78,9 @@ class Movies_Nolte {
     
     
     /**
-	 * Creating output for custom metabox
-	 * @param object $post The post object.
-	 */
+     * Creating output for custom metabox
+     * @param object $post The post object.
+     */
     public function meta_box_content( $post ) {
         
         // Creating nonce to valid when the form was submitted
@@ -93,6 +95,7 @@ class Movies_Nolte {
                     <td>
                         <input id="poster_url" style="width:100%" type="text"  name="poster_url" value="<?php echo get_post_meta( $post->ID, 'poster_url', true );?>" />
                         <br>
+                        <input id="upload_image_button" type="button" value="Upload Image" />
                     </td>
                 </tr>
                 <tr>
@@ -143,7 +146,7 @@ class Movies_Nolte {
      * @param int $post_id The ID of the post being saved.
      */
     public function save_meta($post_id) {
-		// Check if our nonce is set.
+        // Check if our nonce is set.
         if (! isset($_POST['movie_information_nonce']) ) {
             return $post_id;
         }
@@ -176,95 +179,118 @@ class Movies_Nolte {
         
         // Updating metadata
         
-		if ( isset( $_POST['poster_url'] ) ) {
-			update_post_meta( $post_id, 'poster_url', sanitize_text_field( $_POST['poster_url'] ) );
-		}
-		if ( isset( $_POST['rating'] ) ) {
-			update_post_meta( $post_id, 'rating', sanitize_text_field( $_POST['rating'] ) );
-		}
-		if ( isset( $_POST['year'] ) ) {
-			update_post_meta( $post_id, 'year', sanitize_text_field( $_POST['year'] ) );
-		}
-		if ( isset( $_POST['short_description'] ) ) {
-			update_post_meta( $post_id, 'short_description', sanitize_text_field( $_POST['short_description'] ) );
-		}
-		
-		delete_transient( 'cacheMoviesQuery' );
-	}
-	
-	/**
-	 * Rewriting url so that it can be accessible from /movies.json
-	 */
-	public function rewrite_url() {
-	    global $wp_rewrite;
-	    add_rewrite_tag( '%movies%', '([^&]+)' );
-	    add_rewrite_rule( 'movies.json', 'index.php?movies=all', 'top' );
-	}
-	
-	/**
-	 * Getting movies to display results as json format
-	 */
-	public function json_output() {
-	    
-	   global $wp_query;
-	    
-	    $movies_tag = $wp_query->get( 'movies' );
-	    
-	    
-	    if ( ! $movies_tag ) {
-	        return;
-	    }
-	    
-	    $movies_array = array();
-	    
-	    $args = array(
-	        'post_type' => 'movies',
-	        'posts_per_page' => 100,
-	    );
-	    
+        if ( isset( $_POST['poster_url'] ) ) {
+            update_post_meta( $post_id, 'poster_url', sanitize_text_field( $_POST['poster_url'] ) );
+        }
+        if ( isset( $_POST['rating'] ) ) {
+            update_post_meta( $post_id, 'rating', sanitize_text_field( $_POST['rating'] ) );
+        }
+        if ( isset( $_POST['year'] ) ) {
+            update_post_meta( $post_id, 'year', sanitize_text_field( $_POST['year'] ) );
+        }
+        if ( isset( $_POST['short_description'] ) ) {
+            update_post_meta( $post_id, 'short_description', sanitize_text_field( $_POST['short_description'] ) );
+        }
+        
+        delete_transient( 'cacheMoviesQuery' );
+    }
+    
+    /**
+     * Rewriting url so that it can be accessible from /movies.json
+     */
+    public function rewrite_url() {
+        global $wp_rewrite;
+        add_rewrite_tag( '%movies%', '([^&]+)' );
+        add_rewrite_rule( 'movies.json', 'index.php?movies=all', 'top' );
+    }
+    
+    /**
+     * Getting movies to display results as json format
+     */
+    public function json_output() {
+        
+       global $wp_query;
+        
+        $movies_tag = $wp_query->get( 'movies' );
+        
+        
+        if ( ! $movies_tag ) {
+            return;
+        }
+        
+        $movies_array = array();
+        
+        $args = array(
+            'post_type' => 'movies',
+            'posts_per_page' => 100,
+        );
+        
 
-	    // Get any existing copy of our transient data
+        // Get any existing copy of our transient data
         if ( false === ( $movies_query = get_transient( 'cacheMoviesQuery' ) ) ) {
           // It wasn't there, so regenerate the data and save the transient
           $movies_query = new WP_Query($args);
           set_transient( 'cacheMoviesQuery', $movies_query );
         }
 
-	    if ( $movies_query->have_posts() ) : while ( $movies_query->have_posts() ) : $movies_query->the_post();
-	        $post_id = get_the_ID();
-	        
-	        $movies_array['data'][] = array(
-	           'id' => $post_id,
-	           'title' => get_the_title(),
-	           'poster_url'=> get_post_meta($post_id, 'poster_url', true),
-	           'rating' => get_post_meta($post_id, 'rating', true),
-	           'year' => get_post_meta($post_id, 'year', true),
-	           'short_description' => get_post_meta($post_id, 'short_description', true)
-	        );
-	        
+        if ( $movies_query->have_posts() ) : while ( $movies_query->have_posts() ) : $movies_query->the_post();
+            $post_id = get_the_ID();
+            
+            $movies_array['data'][] = array(
+               'id' => $post_id,
+               'title' => get_the_title(),
+               'poster_url'=> get_post_meta($post_id, 'poster_url', true),
+               'rating' => get_post_meta($post_id, 'rating', true),
+               'year' => get_post_meta($post_id, 'year', true),
+               'short_description' => get_post_meta($post_id, 'short_description', true)
+            );
+            
         endwhile;
-	    
-        wp_reset_postdata(); 
-	    
-        endif;
         
-        header( 'Content-Type: application/json' );
-	    wp_send_json( $movies_array );
-	    
-	}
-	
-	public function register_shortcode() {
-	    add_shortcode('list-movies', array( $this, 'render_shortcode' ) );
-	}
-	
+        wp_reset_postdata(); 
+        
+        endif;
+        header("Access-Control-Allow-Origin: *");
+        header( 'Content-Type: application/json;' );
+        wp_send_json( $movies_array );
+        
+    }
+    
+    public function register_shortcode() {
+        add_shortcode('list-movies', array( $this, 'render_shortcode' ) );
+    }
+    
+    public function get_json() {
+        
+        $response = wp_remote_get( get_site_url().'/movies.json' );
+        //die(var_dump($response));
+        if( is_array($response) ) {
+          $body = $response['body']; // use the content
+          return $body;
+        }else{
+            return null;
+        }
+    }
+    
     public function render_shortcode() {
-        $output = "<div ng-app='moviesNolte'><div data-movies-nolte-list></div></div>";
+        $output = "<div ng-app='moviesNolte'><div data-movies-nolte-list='". $this->get_json() ."'></div></div>";
         echo $output;
     }
     
     public function import_script_files() {
         wp_enqueue_script( 'angular-js', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js', array(), false, true );
         wp_enqueue_script( 'movies-nolte-js', plugins_url( 'js/movies-nolte.js', __FILE__ ), array(), false, true );
+    }
+
+    public function import_admin_script_files() {
+        wp_enqueue_script('media-upload');
+        wp_enqueue_script('thickbox');
+        wp_register_script('my-upload', plugins_url( 'js/scripts.js', __FILE__ ), array('jquery','media-upload','thickbox'));
+        wp_enqueue_script('my-upload');
+    }
+
+    public function import_admin_styles_files() {
+        wp_enqueue_style('thickbox');
     }
 }
 ?>

@@ -6,7 +6,7 @@ moviesNolteModule.factory('MoviesService', function( $http ){
     var MoviesService = {
         getAll: function() {
             
-            var promise = $http.get( 'movies.json' ).then( function( response) {
+            var promise = $http({method: 'GET', url: 'http://localhost/wordpress/movies.json' }).success( function( response) {
                 return response.data;
             });
             
@@ -21,12 +21,13 @@ moviesNolteModule.factory('MoviesService', function( $http ){
 moviesNolteModule.directive('moviesNolteList', function( MoviesService ) {
     return {
         restrict: 'A',
-        templateUrl: '/wp-content/plugins/moviesnolte/js/movies-list.html',
-        link: function() {
-            MoviesService.getAll().then( function( data ){
-                console.log( data );
-            })
-            
+        scope: {
+            'moviesNolteList': '@'
+        },
+        templateUrl: 'wp-content/plugins/nolte-test/js/movies-list.html',
+        link: function($scope, element, attrs) {     
+            $scope.moviesData = eval('(' + $scope.moviesNolteList + ')');
+            console.log($scope.moviesData);
         }
     };
 })
