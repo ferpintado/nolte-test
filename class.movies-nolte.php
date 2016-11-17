@@ -220,7 +220,7 @@ class Movies_Nolte {
         $movies_tag = $wp_query->get( 'movies' );
         
         
-        if ( ! $movies_tag ) {
+        if ( ! $movies_tag || $movies_tag !== 'all' ) {            
             return;
         }
         
