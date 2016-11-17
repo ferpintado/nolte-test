@@ -2,23 +2,7 @@
 
 var moviesNolteModule = angular.module('moviesNolte', []);
 
-moviesNolteModule.factory('MoviesService', function( $http ){
-    var MoviesService = {
-        getAll: function() {
-            
-            var promise = $http({method: 'GET', url: 'http://localhost/wordpress/movies.json' }).success( function( response) {
-                return response.data;
-            });
-            
-            return promise;
-            
-        }
-    };
-    
-    return MoviesService;
-});
-
-moviesNolteModule.directive('moviesNolteList', function( MoviesService ) {
+moviesNolteModule.directive('moviesNolteList', function( $sce ) {
     return {
         restrict: 'A',
         scope: {

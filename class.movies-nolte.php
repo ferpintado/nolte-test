@@ -130,8 +130,14 @@ class Movies_Nolte {
                         <label for="short_description"><?php _e( 'Short description:', 'movies_noite' ); ?></label>
                     </th>
                     <td>
+                    <?php 
+                        $my_meta_content = get_post_meta($post->ID, 'short_description', true);
+                        if (!$my_meta_content) $my_meta_content = '';
+                        wp_nonce_field( 'movies'.$post->ID, 'short_description_noncename');
+                        wp_editor( $my_meta_content, 'short_description', array('textarea_rows' => '10'));
+                    ?>
                         
-                        <textarea id="short_description" name="short_description" rows="4" cols="50"><?php echo get_post_meta($post->ID, 'short_description', true);?></textarea>
+                       
                         <br>
                     </td>
                 </tr>
@@ -233,6 +239,8 @@ class Movies_Nolte {
           set_transient( 'cacheMoviesQuery', $movies_query );
         }
 
+        $movies_array['data']= array();
+
         if ( $movies_query->have_posts() ) : while ( $movies_query->have_posts() ) : $movies_query->the_post();
             $post_id = get_the_ID();
             
@@ -263,12 +271,11 @@ class Movies_Nolte {
     public function get_json() {
         
         $response = wp_remote_get( get_site_url().'/movies.json' );
-        //die(var_dump($response));
         if( is_array($response) ) {
           $body = $response['body']; // use the content
           return $body;
         }else{
-            return null;
+            return "{ 'data' : [] }";
         }
     }
     
@@ -278,6 +285,9 @@ class Movies_Nolte {
     }
     
     public function import_script_files() {
+        wp_enqueue_style( 'google-font', plugins_url( 'http://fonts.googleapis.com/css?family=Raleway:400,800,500,600' ), array(), false, 'all' );
+        wp_enqueue_style( 'main-css', plugins_url( 'css/movies-nolte.css', __FILE__ ), array(), false, 'all' );
+
         wp_enqueue_script( 'angular-js', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js', array(), false, true );
         wp_enqueue_script( 'movies-nolte-js', plugins_url( 'js/movies-nolte.js', __FILE__ ), array(), false, true );
     }
