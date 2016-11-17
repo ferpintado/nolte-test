@@ -285,7 +285,7 @@ class Movies_Nolte {
     }
     
     public function import_script_files() {
-        wp_enqueue_style( 'google-font', plugins_url( 'http://fonts.googleapis.com/css?family=Raleway:400,800,500,600' ), array(), false, 'all' );
+        wp_enqueue_style( 'google-font', 'http://fonts.googleapis.com/css?family=Raleway:400,800,500,600' , array(), false, 'all' );
         wp_enqueue_style( 'main-css', plugins_url( 'css/movies-nolte.css', __FILE__ ), array(), false, 'all' );
 
         wp_enqueue_script( 'angular-js', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js', array(), false, true );
